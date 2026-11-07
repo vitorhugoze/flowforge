@@ -62,15 +62,15 @@ def test_transform_and_filter_handlers(tmp_path: Path) -> None:
         _ctx(
             tmp_path,
             upstream={"flt": filtered},
-            config={"uppercase_fields": ["tier"], "defaults": {"currency": "BRL"}},
+            config={"uppercase_fields": ["tier"], "defaults": {"currency": "USD"}},
         )
     )
-    assert mapped["records"][0] == {"id": "1", "tier": "GOLD", "amount": 120, "currency": "BRL"}
+    assert mapped["records"][0] == {"id": "1", "tier": "GOLD", "amount": 120, "currency": "USD"}
 
     projected = SelectFieldsHandler().execute(
         _ctx(tmp_path, upstream={"map": mapped}, config={"fields": ["id", "currency"]})
     )
-    assert projected["records"] == [{"id": "1", "currency": "BRL"}]
+    assert projected["records"] == [{"id": "1", "currency": "USD"}]
 
 
 def test_numeric_summary_and_template(tmp_path: Path) -> None:
