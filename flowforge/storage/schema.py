@@ -27,7 +27,7 @@ SCHEMA_STATEMENTS: tuple[str, ...] = (
         status TEXT NOT NULL,
         priority INTEGER NOT NULL,
         triggered_by TEXT NOT NULL,
-        idempotency_key TEXT UNIQUE,
+        dedup_ref TEXT UNIQUE,
         inputs_json TEXT NOT NULL,
         outputs_json TEXT NOT NULL,
         attempt_count INTEGER NOT NULL DEFAULT 0,

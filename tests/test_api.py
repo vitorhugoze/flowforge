@@ -22,9 +22,9 @@ def test_api_workflow_lifecycle_execution_and_metrics(api_client: TestClient) ->
             "steps": [
                 {
                     "key": "normalize",
-                    "name": "Normalize Emails",
+                    "name": "Normalize Departments",
                     "handler": "transform.map_values",
-                    "config": {"lowercase_fields": ["email"]},
+                    "config": {"lowercase_fields": ["department"]},
                 },
                 {
                     "key": "report",
@@ -44,7 +44,7 @@ def test_api_workflow_lifecycle_execution_and_metrics(api_client: TestClient) ->
         "/workflows",
         json={
             "name": "customer-onboarding",
-            "steps": [{"key": "s1", "name": "S1", "handler": "control.passthrough"}],
+            "steps": [{"key": "passthrough", "name": "Pass", "handler": "control.passthrough"}],
         },
     )
     assert dup_resp.status_code == 409
@@ -55,7 +55,7 @@ def test_api_workflow_lifecycle_execution_and_metrics(api_client: TestClient) ->
 
     run_resp = api_client.post(
         "/workflows/customer-onboarding/runs",
-        json={"inputs": {"records": [{"email": "ALICE@EXAMPLE.COM"}]}},
+        json={"inputs": {"records": [{"department": "OPERATIONS_TEAM"}]}},
     )
     assert run_resp.status_code == 201
     run_id = run_resp.json()["run_id"]
@@ -68,7 +68,7 @@ def test_api_workflow_lifecycle_execution_and_metrics(api_client: TestClient) ->
     assert detail_resp.status_code == 200
     body = detail_resp.json()
     assert body["status"] == "succeeded"
-    assert body["outputs"]["normalize"]["records"][0]["email"] == "alice@example.com"
+    assert body["outputs"]["normalize"]["records"][0]["department"] == "operations_team"
     assert body["outputs"]["report"]["rendered"] == "Processed 1 onboarding records"
 
     metrics_resp = api_client.get("/metrics")

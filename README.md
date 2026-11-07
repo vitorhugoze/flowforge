@@ -76,10 +76,10 @@ python -m flowforge.cli.main --db-path /tmp/flowforge-demo.db metrics
 ### 2. HTTP Server (FastAPI)
 
 ```bash
-python -m flowforge.cli.main serve --host 127.0.0.1 --port 8000
+python -m flowforge.cli.main serve --port 8000
 ```
 
-Interactive OpenAPI documentation is served at `http://127.0.0.1:8000/docs`.
+Interactive OpenAPI documentation is available at `/docs` while the server is running.
 
 ---
 

@@ -60,7 +60,7 @@ class ConditionalAssertHandler:
                 retryable=retryable,
             )
 
-        required_input = ctx.config.get("require_input_key")
+        required_input = ctx.config.get("require_input_field")
         if isinstance(required_input, str) and required_input not in ctx.run_inputs:
             raise StepExecutionError(
                 f"Required run input '{required_input}' is missing",

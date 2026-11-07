@@ -139,8 +139,8 @@ class OrchestratorService:
         request: RunTriggerRequest | None = None,
     ) -> WorkflowRun:
         req = request or RunTriggerRequest()
-        if req.idempotency_key:
-            existing = self.runs.find_by_idempotency_key(req.idempotency_key)
+        if req.dedup_ref:
+            existing = self.runs.find_by_dedup_ref(req.dedup_ref)
             if existing is not None:
                 return existing
 
@@ -160,7 +160,7 @@ class OrchestratorService:
             inputs=req.inputs,
             priority=effective_priority,
             triggered_by=req.triggered_by,
-            idempotency_key=req.idempotency_key,
+            dedup_ref=req.dedup_ref,
         )
         max_attempts = 1 + workflow.retry_policy.max_retries
         self.queue.enqueue(

@@ -50,8 +50,11 @@ def run_cli(argv: list[str] | None = None) -> str:
     try:
         if cmd == "serve":
             app = create_app(service=service)
-            uvicorn.run(app, host=args.host, port=args.port)
-            return _envelope(cmd, "ok", {"host": args.host, "port": args.port})
+            run_kwargs: dict[str, Any] = {"port": args.port}
+            if args.interface:
+                run_kwargs["host"] = args.interface
+            uvicorn.run(app, **run_kwargs)
+            return _envelope(cmd, "ok", {"port": args.port})
 
         if cmd == "handlers":
             return _envelope(cmd, "ok", service.list_handlers())
@@ -76,7 +79,7 @@ def run_cli(argv: list[str] | None = None) -> str:
                 inputs=_read_json_arg(args.inputs),
                 priority=prio,
                 triggered_by="cli",
-                idempotency_key=args.idempotency_key,
+                dedup_ref=args.dedup_ref,
             )
             run = service.trigger_run(args.workflow_ref, req)
             return _envelope(cmd, "ok", run.model_dump(mode="json"))

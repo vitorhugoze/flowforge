@@ -59,11 +59,11 @@ class RunRepository:
             finished_at=from_iso_utc(row["finished_at"]),
         )
 
-    def find_by_idempotency_key(self, idempotency_key: str) -> WorkflowRun | None:
+    def find_by_dedup_ref(self, dedup_ref: str) -> WorkflowRun | None:
         with self._db.session() as conn:
             row = conn.execute(
-                "SELECT run_id FROM workflow_runs WHERE idempotency_key = ?",
-                (idempotency_key,),
+                "SELECT run_id FROM workflow_runs WHERE dedup_ref = ?",
+                (dedup_ref,),
             ).fetchone()
         if row is None:
             return None
@@ -76,7 +76,7 @@ class RunRepository:
         inputs: dict[str, Any],
         priority: PriorityLevel,
         triggered_by: str,
-        idempotency_key: str | None = None,
+        dedup_ref: str | None = None,
     ) -> WorkflowRun:
         run_id = str(uuid.uuid4())
         now_str = to_iso_utc(utc_now())
@@ -85,7 +85,7 @@ class RunRepository:
                 """
                 INSERT INTO workflow_runs (
                     run_id, workflow_id, workflow_name, workflow_version, status,
-                    priority, triggered_by, idempotency_key, inputs_json, outputs_json,
+                    priority, triggered_by, dedup_ref, inputs_json, outputs_json,
                     attempt_count, max_retries, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', 0, ?, ?)
                 """,
@@ -97,7 +97,7 @@ class RunRepository:
                     RunStatus.QUEUED.value,
                     int(priority),
                     triggered_by,
-                    idempotency_key,
+                    dedup_ref,
                     json.dumps(inputs),
                     workflow.retry_policy.max_retries,
                     now_str,
@@ -145,7 +145,7 @@ class RunRepository:
             status=RunStatus(row["status"]),
             priority=PriorityLevel(int(row["priority"])),
             triggered_by=row["triggered_by"],
-            idempotency_key=row["idempotency_key"],
+            dedup_ref=row["dedup_ref"],
             inputs=json.loads(row["inputs_json"]),
             outputs=json.loads(row["outputs_json"]),
             attempt_count=int(row["attempt_count"]),

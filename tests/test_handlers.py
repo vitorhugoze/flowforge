@@ -26,9 +26,9 @@ def _ctx(
     config: dict | None = None,
 ) -> StepContext:
     return StepContext(
-        run_id="run-1",
-        workflow_id="wf-1",
-        step_key="step-1",
+        run_id="sample_run",
+        workflow_id="sample_wf",
+        step_key="primary_stage",
         attempt=1,
         run_inputs=inputs or {},
         upstream_outputs=upstream or {},

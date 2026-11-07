@@ -1,4 +1,4 @@
-"""Tests for priority queue ordering, idempotency keys, and scheduled workflow triggers."""
+"""Tests for priority queue ordering, deduplication references, and scheduled workflow triggers."""
 
 from __future__ import annotations
 
@@ -30,15 +30,15 @@ def test_priority_queue_claims_highest_priority_first(orchestrator: Orchestrator
     assert report.processed_run_ids == [crit_run.run_id, high_run.run_id, low_run.run_id]
 
 
-def test_idempotency_key_returns_existing_run(orchestrator: OrchestratorService) -> None:
+def test_dedup_ref_returns_existing_run(orchestrator: OrchestratorService) -> None:
     wf = orchestrator.create_workflow(
         WorkflowCreate(
-            name="idempotent-flow",
-            steps=[StepDefinition(key="s1", name="Step 1", handler="control.passthrough")],
+            name="deduplicated-flow",
+            steps=[StepDefinition(key="passthrough", name="Step One", handler="control.passthrough")],
         )
     )
-    first = orchestrator.trigger_run(wf.name, RunTriggerRequest(idempotency_key="req-abc-123"))
-    second = orchestrator.trigger_run(wf.name, RunTriggerRequest(idempotency_key="req-abc-123"))
+    first = orchestrator.trigger_run(wf.name, RunTriggerRequest(dedup_ref="batch_alpha"))
+    second = orchestrator.trigger_run(wf.name, RunTriggerRequest(dedup_ref="batch_alpha"))
     assert first.run_id == second.run_id
 
 

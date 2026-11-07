@@ -17,7 +17,7 @@ class RunTriggerRequest(BaseModel):
     priority: PriorityLevel | None = None
     queue_name: str | None = None
     triggered_by: str = Field(default="manual", min_length=1, max_length=100)
-    idempotency_key: str | None = Field(default=None, max_length=120)
+    dedup_ref: str | None = Field(default=None, max_length=120)
 
 
 class StepRun(BaseModel):
@@ -47,7 +47,7 @@ class WorkflowRun(BaseModel):
     status: RunStatus
     priority: PriorityLevel
     triggered_by: str
-    idempotency_key: str | None = None
+    dedup_ref: str | None = None
     inputs: dict[str, Any] = Field(default_factory=dict)
     outputs: dict[str, Any] = Field(default_factory=dict)
     attempt_count: int = 0

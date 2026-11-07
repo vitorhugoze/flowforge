@@ -40,7 +40,7 @@ def build_cli_parser() -> argparse.ArgumentParser:
         choices=["low", "normal", "high", "critical"],
         default=None,
     )
-    run_trig.add_argument("--idempotency-key", default=None)
+    run_trig.add_argument("--dedup-ref", default=None)
 
     run_get = sub.add_parser("run-get", help="Inspect a workflow run and its step traces")
     run_get.add_argument("run_id", help="Target run ID")
@@ -87,8 +87,8 @@ def build_cli_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("metrics", help="Show aggregated operational telemetry")
 
-    serve_cmd = sub.add_parser("serve", help="Run the FastAPI HTTP server with uvicorn")
-    serve_cmd.add_argument("--host", default="127.0.0.1")
+    serve_cmd = sub.add_parser("serve", help="Run the HTTP server with uvicorn")
+    serve_cmd.add_argument("--interface", default=None, help="Optional network interface to bind")
     serve_cmd.add_argument("--port", type=int, default=8000)
 
     return parser
